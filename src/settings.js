@@ -9,7 +9,7 @@ module.exports = {
   fixedHeader: false,
 
   /**
-   * @type {boolean} true | false
+   * @type { boolean} true | false
    * @description Whether show the logo in sidebar
    */
   sidebarLogo: true
