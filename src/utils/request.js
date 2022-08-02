@@ -71,24 +71,38 @@
 // export default service
 
 import axios from "axios";
+import store from '@/store'
 import { Message } from "element-ui";
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API
+  baseURL: process.env.VUE_APP_BASE_API,
 }); // 创建一个axios的实例
-service.interceptors.request.use(); // 请求拦截器
+service.interceptors.request.use(
+  // 当前的请求的配置
+  (config) => {
+    // 在这个位置需要统一的去注入token
+    if (store.state.user.token) {
+      // 如果token存在 注入token
+      config.headers["Authorization"] = `Bearer ${store.state.user.token}`;
+    }
+    return config; // 必须返回配置
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 service.interceptors.response.use(
   (res) => {
-    const { success , data, message } = res.data
+    const { success, data, message } = res.data;
     if (success) {
-      return data
+      return data;
     }
-    Message.error(message)
-    return Promise.reject(new Error(message))
+    Message.error(message);
+    return Promise.reject(new Error(message));
   },
-  function(error) {
+  function (error) {
     // 对响应错误做点什么
-    Message.error('系统异常')
-    return Promise.reject(error)
+    Message.error("系统异常");
+    return Promise.reject(error);
   }
 ); // 响应拦截器
 
