@@ -75,14 +75,14 @@ import store from "@/store";
 import router from "@/router";
 import { Message } from "element-ui";
 import { getTokenTime } from "./auth";
-// function isTimeOUt() {
-//   // 如果token存在 注入token
-//   const currentTime = Date.now();
-//   const tokenTime = getTokenTime();
-//   const timeout = 3 * 1000;
-//   console.log(currentTime - tokenTime > timeout);
-//   return currentTime - tokenTime > timeout;
-// }
+function isTimeOUt() {
+  // 如果token存在 注入token
+  const currentTime = Date.now();
+  const tokenTime = getTokenTime();
+  const timeout = 3 * 1000;
+  console.log(currentTime - tokenTime > timeout);
+  return currentTime - tokenTime > timeout;
+}
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
 }); // 创建一个axios的实例
@@ -93,17 +93,17 @@ service.interceptors.request.use(
     // 在这个位置需要统一的去注入token
     if (store.state.user.token) {
       // 如果token存在 注入token
-      // if (isTimeOUt()) {
-        // console.log("jin");
+      if (isTimeOUt()) {
+        console.log("jin");
         // 判断token是否过期 过期跳到登录页
-        // await store.dispatch("user/logout");
-        // router.push("/login");
-        // return Promise.reject(new Error("登录过期"));
-      // } else {
+        await store.dispatch("user/logout");
+        router.push("/login");
+        return Promise.reject(new Error("登录过期"));
+      } else {
         // token没有过期再携带
-        // console.log("token没过期");
+        console.log("token没过期");
         config.headers["Authorization"] = `Bearer ${store.state.user.token}`;
-      // }
+      }
     }
     return config; // 必须返回配置
   },
