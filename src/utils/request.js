@@ -79,7 +79,7 @@ function isTimeOUt() {
   // 如果token存在 注入token
   const currentTime = Date.now();
   const tokenTime = getTokenTime();
-  const timeout = 3 * 1000;
+  const timeout = 2 * 60 * 1000;
   console.log(currentTime - tokenTime > timeout);
   return currentTime - tokenTime > timeout;
 }
@@ -94,14 +94,14 @@ service.interceptors.request.use(
     if (store.state.user.token) {
       // 如果token存在 注入token
       if (isTimeOUt()) {
-        console.log("jin");
+        // console.log("jin");
         // 判断token是否过期 过期跳到登录页
         await store.dispatch("user/logout");
         router.push("/login");
         return Promise.reject(new Error("登录过期"));
       } else {
         // token没有过期再携带
-        console.log("token没过期");
+        // console.log("token没过期");
         config.headers["Authorization"] = `Bearer ${store.state.user.token}`;
       }
     }
