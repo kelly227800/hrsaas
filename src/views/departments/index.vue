@@ -1,15 +1,32 @@
 <template>
   <div class="dashboard-container">
-    <div class="app-container">
+    <div class="app-container" v-loading="loading">
+      <add-dept
+        :visible.sync="addDialogVisible"
+        :currentNode="currentNode"
+        ref="addDept"
+        @updateDeptsList="loadDepts()"
+      />
       <el-card class="box-card">
-        <!-- 头部 -->
-        <TreeTools :treeNode="company" :isRoot="true"/>
+        <treeTools
+          :isRoot="true"
+          :treeNode="{ name: '传智教育', manager: '负责人' }"
+          @add="addDialogVisible = true"
+        ></treeTools>
         <!-- 树形 -->
-        <el-tree :data="treeData" :props="defaultProps" default-expand-all>
-          <!-- 作用域插槽 -->
-          <!-- v-slot 获取组件内部slot提供的数据 -->
+        <el-tree
+          :data="treeData"
+          :props="defaultProps"
+          accordion
+          default-expand-all
+        >
           <template v-slot="{ data }">
-            <TreeTools :treeNode="data"/>
+            <treeTools
+              :treeNode="data"
+              @remove="loadDepts()"
+              @add="addFn"
+              @editDepts="editFn"
+            ></treeTools>
           </template>
         </el-tree>
       </el-card>
@@ -18,38 +35,53 @@
 </template>
 
 <script>
-import TreeTools from "./components/tree-tools.vue";
-import {getDeptsApi} from '@/api/department.js'
-import { transListToTree } from '@/utils/index'
+import treeTools from "./modules/tree-tools.vue";
+import { getDepts } from "@/api/departments";
+import { transListToTree } from "@/utils";
+import AddDept from "./components/add-dept.vue";
 export default {
+  components: {
+    treeTools,
+    AddDept,
+  },
   data() {
     return {
       defaultProps: {
         label: "name",
       },
-      treeData: [
-        { name: "总裁办", children: [{ name: "董事会" }] },
-        { name: "行政部" },
-        { name: "人事部" },
-      ],
-      company: { name: "传智教育", manager: "负责人" },
+      treeData: [],
+      addDialogVisible: false,
+      currentNode: {},
+      loading: false,
     };
-  },
-  components: {
-    TreeTools,
   },
 
   created() {
-    this.loadDepts()
+    this.loadDepts();
   },
 
   methods: {
     async loadDepts() {
-      const res = await getDeptsApi()
-      console.log(res)
-      this.treeData = res.depts
-      this.treeData = transListToTree(this.treeData, '')
-    }
+      this.loading = true;
+      const res = await getDepts();
+      this.loading = false;
+      console.log(res);
+
+      console.log(newres);
+
+      const newres = transListToTree(res.depts, "");
+      this.treeData = res.depts;
+    },
+    addFn(val) {
+      this.addDialogVisible = true;
+      this.currentNode = val;
+      console.log(this.currentNode);
+    },
+    editFn(val) {
+      console.log(val);
+      this.addDialogVisible = true;
+      this.$refs.addDept.getDeptsById(val.id);
+    },
   },
 };
 </script>

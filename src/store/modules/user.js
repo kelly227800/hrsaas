@@ -19,13 +19,13 @@ export default {
     async getToken(context,payload) {
       // 发送请求得来的
       const data = await login(payload)
-      console.log(data);
+      // console.log(data);
       context.commit('setToken', data);
       setTokenTime()
     },
     async getUserInfo(context) {
       const userBaseInfo = await getUserInfoApi()
-      console.log(userBaseInfo)
+      // console.log(userBaseInfo)
       const userInfo = await getUserDetailsApi(userBaseInfo.userId)
       context.commit('setUserInfo', {...userBaseInfo, ...userInfo })
     },

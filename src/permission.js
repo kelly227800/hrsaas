@@ -70,13 +70,13 @@ import store from './store'
 // from: 来自于哪个路由的信息
 // next: 是否进入
 const whiteList = ['/login','/404']
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const token = store.state.user.token
     if(token) {
         // 1.登录
         // 是否进入登录页
         if(!store.state.user.userInfo.userId) {
-            store.dispatch('user/getUserInfo')
+            await store.dispatch('user/getUserInfo')
         }
         if(to.path === '/login') {
             // 1.1 是 跳到首页
